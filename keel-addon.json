@@ -1,36 +1,143 @@
 {
-  "name": "my-addon",
-  "version": "0.1.0",
-  "description": "Description of my addon",
-  "repo": "github.com/your-user/your-repo",
-  "steps": [
-    {
-      "type": "go_get",
-      "package": "github.com/your-user/your-repo"
-    },
-    {
-      "type": "property",
-      "key": "addon.example-key",
-      "example": "${ADDON_EXAMPLE_KEY:}",
-      "description": "Example runtime setting exposed through application.properties."
-    },
-    {
-      "type": "env",
-      "key": "ADDON_EXAMPLE_KEY",
-      "example": "",
-      "description": "Example environment variable consumed by application.properties."
-    },
-    {
-      "type": "create_provider_file",
-      "filename": "cmd/setup_my_addon.go",
-      "guard": "func setupMyAddon(",
-      "content": "package main\n\nimport (\n\t\"github.com/slice-soft/ss-keel-core/config\"\n\t\"github.com/slice-soft/ss-keel-core/core\"\n)\n\ntype myAddonConfig struct {\n\tExampleKey string `keel:\"addon.example-key\"`\n}\n\nfunc setupMyAddon(app *core.App) {\n\t_ = app\n\t_ = config.MustLoadConfig[myAddonConfig]()\n}\n"
-    },
-    {
-      "type": "main_code",
-      "anchor": "before_modules",
-      "guard": "setupMyAddon(",
-      "code": "setupMyAddon(app)"
-    }
-  ]
+    "name": "ss-keel-otel",
+    "version": "0.1.0",
+    "description": "OpenTelemetry instrumentation — traces, metrics, and automatic Fiber HTTP spans via OTLP",
+    "repo": "github.com/slice-soft/ss-keel-otel",
+    "capabilities": [
+        "observability"
+    ],
+    "steps": [
+        {
+            "type": "go_get",
+            "package": "github.com/slice-soft/ss-keel-otel"
+        },
+        {
+            "type": "property",
+            "key": "otel.enabled",
+            "example": "${OTEL_ENABLED:false}",
+            "description": "Enable OpenTelemetry instrumentation."
+        },
+        {
+            "type": "property",
+            "key": "otel.service-name",
+            "example": "${OTEL_SERVICE_NAME:my-app}",
+            "description": "Logical service name reported in all telemetry signals."
+        },
+        {
+            "type": "property",
+            "key": "otel.service-version",
+            "example": "${OTEL_SERVICE_VERSION:0.0.0}",
+            "description": "Service version reported as a resource attribute."
+        },
+        {
+            "type": "property",
+            "key": "otel.environment",
+            "example": "${OTEL_ENVIRONMENT:development}",
+            "description": "Deployment environment (e.g. production, staging, development)."
+        },
+        {
+            "type": "property",
+            "key": "otel.exporter-otlp-endpoint",
+            "example": "${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}",
+            "description": "OTLP collector endpoint. Read directly by the SDK exporter."
+        },
+        {
+            "type": "property",
+            "key": "otel.exporter-otlp-protocol",
+            "example": "${OTEL_EXPORTER_OTLP_PROTOCOL:http/protobuf}",
+            "description": "OTLP transport protocol: http/protobuf (default) or grpc."
+        },
+        {
+            "type": "property",
+            "key": "otel.traces-sampler",
+            "example": "${OTEL_TRACES_SAMPLER:parentbased_always_on}",
+            "description": "Trace sampler: always_on, always_off, parentbased_always_on, traceidratio, parentbased_traceidratio."
+        },
+        {
+            "type": "property",
+            "key": "otel.traces-sampler-arg",
+            "example": "${OTEL_TRACES_SAMPLER_ARG:}",
+            "description": "Sampler argument — ratio value (0.0–1.0) for traceidratio samplers."
+        },
+        {
+            "type": "env",
+            "key": "OTEL_ENABLED",
+            "example": "false",
+            "description": "Enable OpenTelemetry. Set to true in environments where you want telemetry data.",
+            "secret": false,
+            "required": false
+        },
+        {
+            "type": "env",
+            "key": "OTEL_SERVICE_NAME",
+            "example": "my-app",
+            "description": "Logical service name. Appears in traces, metrics, and dashboards.",
+            "secret": false,
+            "required": true
+        },
+        {
+            "type": "env",
+            "key": "OTEL_SERVICE_VERSION",
+            "example": "0.0.0",
+            "description": "Service version (e.g. 1.4.2). Reported as a resource attribute.",
+            "secret": false,
+            "required": false
+        },
+        {
+            "type": "env",
+            "key": "OTEL_ENVIRONMENT",
+            "example": "development",
+            "description": "Deployment environment. Shown in traces and dashboards (e.g. production, staging).",
+            "secret": false,
+            "required": false
+        },
+        {
+            "type": "env",
+            "key": "OTEL_EXPORTER_OTLP_ENDPOINT",
+            "example": "http://localhost:4318",
+            "description": "OTLP collector endpoint. Point to your OTel Collector, Grafana Alloy, or any OTLP-compatible receiver.",
+            "secret": false,
+            "required": false
+        },
+        {
+            "type": "env",
+            "key": "OTEL_EXPORTER_OTLP_PROTOCOL",
+            "example": "http/protobuf",
+            "description": "OTLP transport: http/protobuf (default) or grpc.",
+            "secret": false,
+            "required": false
+        },
+        {
+            "type": "env",
+            "key": "OTEL_TRACES_SAMPLER",
+            "example": "parentbased_always_on",
+            "description": "Trace sampler strategy. Use traceidratio with OTEL_TRACES_SAMPLER_ARG for production rate control.",
+            "secret": false,
+            "required": false
+        },
+        {
+            "type": "env",
+            "key": "OTEL_TRACES_SAMPLER_ARG",
+            "example": "",
+            "description": "Sampler argument for ratio-based samplers (0.0–1.0). Example: 0.1 samples 10% of traces.",
+            "secret": false,
+            "required": false
+        },
+        {
+            "type": "create_provider_file",
+            "filename": "cmd/setup_otel.go",
+            "guard": "func setupOtel(",
+            "content": "package main\n\nimport (\n\t\"github.com/slice-soft/ss-keel-core/config\"\n\t\"github.com/slice-soft/ss-keel-core/core\"\n\t\"github.com/slice-soft/ss-keel-core/logger\"\n\tssotel \"github.com/slice-soft/ss-keel-otel/otel\"\n)\n\n// setupOtel initialises the OpenTelemetry SDK and registers the Fiber HTTP middleware.\n// All telemetry is skipped when OTEL_ENABLED=false.\nfunc setupOtel(app *core.App, log *logger.Logger) *ssotel.Provider {\n\totelConfig := config.MustLoadConfig[ssotel.Config]()\n\totelConfig.Logger = log\n\n\tprovider, err := ssotel.New(otelConfig)\n\tif err != nil {\n\t\tlog.Error(\"failed to initialise otel: %v\", err)\n\t\treturn provider\n\t}\n\n\tapp.SetTracer(provider)\n\tapp.Fiber().Use(provider.Middleware())\n\tapp.OnShutdown(provider.Shutdown)\n\n\treturn provider\n}\n"
+        },
+        {
+            "type": "main_code",
+            "anchor": "before_modules",
+            "guard": "setupOtel(",
+            "code": "_ = setupOtel(app, appLogger)"
+        },
+        {
+            "type": "note",
+            "message": "OpenTelemetry is ready. Set OTEL_ENABLED=true and OTEL_EXPORTER_OTLP_ENDPOINT to start sending telemetry.\n\nFor manual spans in your services:\n  ctx, span := app.Tracer().Start(c.UserContext(), \"operation-name\")\n  defer span.End()\n\nSee: docs.keel-go.dev/addons/ss-keel-otel"
+        }
+    ]
 }
