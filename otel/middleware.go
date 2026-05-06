@@ -1,9 +1,11 @@
 package otel
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	keelcore "github.com/slice-soft/ss-keel-core/core"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -31,16 +33,14 @@ func (p *Provider) Middleware() fiber.Handler {
 		carrier := fiberCarrier{c: c}
 		ctx := propagator.Extract(c.UserContext(), carrier)
 
-		route := c.Route().Path
-		spanName := c.Method() + " " + route
-
-		ctx, span := tracer.Start(ctx, spanName,
+		// Start with a placeholder name; the real route is only available after c.Next()
+		// because Fiber resolves the matched route during handler dispatch.
+		ctx, span := tracer.Start(ctx, c.Method()+" <resolving>",
 			trace.WithSpanKind(trace.SpanKindServer),
 			trace.WithAttributes(
 				semconv.HTTPRequestMethodKey.String(c.Method()),
 				semconv.URLPath(c.Path()),
 				semconv.ServerAddress(c.Hostname()),
-				attribute.String("http.route", route),
 				attribute.String("net.peer.ip", c.IP()),
 			),
 		)
@@ -50,7 +50,12 @@ func (p *Provider) Middleware() fiber.Handler {
 
 		err := c.Next()
 
-		status := c.Response().StatusCode()
+		// Route is resolved after c.Next().
+		route := c.Route().Path
+		span.SetName(c.Method() + " " + route)
+		span.SetAttributes(attribute.String("http.route", route))
+
+		status := resolveStatus(c, err)
 		span.SetAttributes(semconv.HTTPResponseStatusCode(status))
 
 		if err != nil {
@@ -62,6 +67,22 @@ func (p *Provider) Middleware() fiber.Handler {
 
 		return err
 	}
+}
+
+// resolveStatus returns the true HTTP status code for the request.
+// c.Response().StatusCode() reads 200 before Fiber's error handler runs,
+// so we inspect the returned error directly when one is present.
+func resolveStatus(c *fiber.Ctx, err error) int {
+	if err != nil {
+		var ke *keelcore.KError
+		if errors.As(err, &ke) {
+			return ke.StatusCode
+		}
+		if fe, ok := err.(*fiber.Error); ok {
+			return fe.Code
+		}
+	}
+	return c.Response().StatusCode()
 }
 
 // fiberCarrier adapts Fiber's request/response headers to propagation.TextMapCarrier.
