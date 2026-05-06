@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/slice-soft/ss-keel-otel/compare/v1.0.0...v1.1.0) (2026-05-06)
+
+
+### Features
+
+* enhance OTel middleware to resolve HTTP status codes accurately ([#3](https://github.com/slice-soft/ss-keel-otel/issues/3)) ([67ea404](https://github.com/slice-soft/ss-keel-otel/commit/67ea4042ddd1d5a9b846e8e045c46f01cf1c95e7))
+
 ## 1.0.0 (2026-05-06)
 
 
