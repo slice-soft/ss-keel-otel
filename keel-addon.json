@@ -1,0 +1,36 @@
+{
+  "name": "my-addon",
+  "version": "0.1.0",
+  "description": "Description of my addon",
+  "repo": "github.com/your-user/your-repo",
+  "steps": [
+    {
+      "type": "go_get",
+      "package": "github.com/your-user/your-repo"
+    },
+    {
+      "type": "property",
+      "key": "addon.example-key",
+      "example": "${ADDON_EXAMPLE_KEY:}",
+      "description": "Example runtime setting exposed through application.properties."
+    },
+    {
+      "type": "env",
+      "key": "ADDON_EXAMPLE_KEY",
+      "example": "",
+      "description": "Example environment variable consumed by application.properties."
+    },
+    {
+      "type": "create_provider_file",
+      "filename": "cmd/setup_my_addon.go",
+      "guard": "func setupMyAddon(",
+      "content": "package main\n\nimport (\n\t\"github.com/slice-soft/ss-keel-core/config\"\n\t\"github.com/slice-soft/ss-keel-core/core\"\n)\n\ntype myAddonConfig struct {\n\tExampleKey string `keel:\"addon.example-key\"`\n}\n\nfunc setupMyAddon(app *core.App) {\n\t_ = app\n\t_ = config.MustLoadConfig[myAddonConfig]()\n}\n"
+    },
+    {
+      "type": "main_code",
+      "anchor": "before_modules",
+      "guard": "setupMyAddon(",
+      "code": "setupMyAddon(app)"
+    }
+  ]
+}
