@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/slice-soft/ss-keel-otel/compare/v1.1.0...v1.1.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* clone URL path string to prevent unintended modifications ([#6](https://github.com/slice-soft/ss-keel-otel/issues/6)) ([f50523f](https://github.com/slice-soft/ss-keel-otel/commit/f50523f1fabc82657b6007971e6fa97db3651378))
+
 ## [1.1.0](https://github.com/slice-soft/ss-keel-otel/compare/v1.0.0...v1.1.0) (2026-05-06)
 
 
