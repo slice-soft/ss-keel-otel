@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.5
-	github.com/slice-soft/ss-keel-core v0.11.0
+	github.com/slice-soft/ss-keel-core v0.12.0
 	go.opentelemetry.io/otel v1.33.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.33.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.33.0
