@@ -3,6 +3,7 @@ package otel
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	keelcore "github.com/slice-soft/ss-keel-core/core"
@@ -39,7 +40,7 @@ func (p *Provider) Middleware() fiber.Handler {
 			trace.WithSpanKind(trace.SpanKindServer),
 			trace.WithAttributes(
 				semconv.HTTPRequestMethodKey.String(c.Method()),
-				semconv.URLPath(c.Path()),
+				semconv.URLPath(strings.Clone(c.Path())),
 				semconv.ServerAddress(c.Hostname()),
 				attribute.String("net.peer.ip", c.IP()),
 			),
