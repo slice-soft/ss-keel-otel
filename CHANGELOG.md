@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/slice-soft/ss-keel-otel/compare/v1.1.1...v1.1.2) (2026-05-08)
+
+
+### Bug Fixes
+
+* update logger type in setupOtel function to use contracts.Logger ([#8](https://github.com/slice-soft/ss-keel-otel/issues/8)) ([6f82da1](https://github.com/slice-soft/ss-keel-otel/commit/6f82da1df82d1c14170bf594a16610f39763e4a0))
+
 ## [1.1.1](https://github.com/slice-soft/ss-keel-otel/compare/v1.1.0...v1.1.1) (2026-05-06)
 
 
