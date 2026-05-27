@@ -5,6 +5,16 @@ import "github.com/slice-soft/ss-keel-core/contracts"
 // ID implements contracts.Addon.
 func (p *Provider) ID() string { return "otel" }
 
+// RegisterWithPanel registers this provider with a devpanel PanelRegistry
+// so span events appear in the Addons tab. Call after setupOtel returns:
+//
+//	if panel, ok := app.GetAddon("devpanel").(contracts.PanelRegistry); ok {
+//	    otelProvider.RegisterWithPanel(panel)
+//	}
+func (p *Provider) RegisterWithPanel(r contracts.PanelRegistry) {
+	r.RegisterAddon(p)
+}
+
 // Manifest implements contracts.Manifestable.
 func (p *Provider) Manifest() contracts.AddonManifest {
 	return contracts.AddonManifest{

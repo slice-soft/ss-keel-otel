@@ -137,7 +137,7 @@
         },
         {
             "type": "note",
-            "message": "OpenTelemetry is ready. Set OTEL_ENABLED=true and OTEL_EXPORTER_OTLP_ENDPOINT to start sending telemetry.\n\nFor manual spans in your services:\n  ctx, span := app.Tracer().Start(c.UserContext(), \"operation-name\")\n  defer span.End()\n\nSee: docs.keel-go.dev/addons/ss-keel-otel"
+            "message": "OpenTelemetry is ready. Set OTEL_ENABLED=true and OTEL_EXPORTER_OTLP_ENDPOINT to start sending telemetry.\n\nFor manual spans in your services:\n  ctx, span := app.Tracer().Start(c.UserContext(), \"operation-name\")\n  defer span.End()\n\nIf devpanel is installed, register span events in the panel:\n  if panel, ok := app.GetAddon(\"devpanel\").(contracts.PanelRegistry); ok {\n      otelProvider.RegisterWithPanel(panel)\n  }\n\nSee: docs.keel-go.dev/addons/ss-keel-otel"
         }
     ]
 }

@@ -29,12 +29,14 @@ type Provider struct {
 	tracerProvider *sdktrace.TracerProvider
 	meterProvider  *sdkmetric.MeterProvider
 	config         Config
+	events         chan contracts.PanelEvent
 }
 
 var (
 	_ contracts.Addon        = (*Provider)(nil)
 	_ contracts.Tracer       = (*Provider)(nil)
 	_ contracts.Manifestable = (*Provider)(nil)
+	_ contracts.Debuggable   = (*Provider)(nil)
 )
 
 // New initializes the OpenTelemetry SDK with the given config.
@@ -46,8 +48,10 @@ var (
 func New(cfg Config) (*Provider, error) {
 	cfg.withDefaults()
 
+	events := make(chan contracts.PanelEvent, 512)
+
 	if !cfg.Enabled {
-		return &Provider{config: cfg}, nil
+		return &Provider{config: cfg, events: events}, nil
 	}
 
 	ctx := context.Background()
@@ -75,6 +79,7 @@ func New(cfg Config) (*Provider, error) {
 
 	tracerProvider := sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(traceExporter),
+		sdktrace.WithSpanProcessor(newSpanEventProcessor(events, "otel")),
 		sdktrace.WithResource(res),
 		sdktrace.WithSampler(sampler),
 	)
@@ -102,6 +107,7 @@ func New(cfg Config) (*Provider, error) {
 		tracerProvider: tracerProvider,
 		meterProvider:  meterProvider,
 		config:         cfg,
+		events:         events,
 	}, nil
 }
 
